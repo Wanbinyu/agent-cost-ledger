@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Usage Chat · cost-ledger</title>
+  <link rel="stylesheet" href="/static/chat.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">◈</span>
+        <div>
+          <div class="title">Usage Chat</div>
+          <div class="subtitle">自动记账 · 不路由请求 · v{{VERSION}}</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button type="button" id="btn-new" class="btn ghost" title="新对话">新对话</button>
+        <button type="button" id="btn-setup" class="btn ghost" title="连接设置">设置</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-label">会话</div>
+        <ul id="session-list"></ul>
+      </aside>
+
+      <section class="chat-pane">
+        <div id="banner" class="banner hidden"></div>
+        <div id="messages" class="messages" aria-live="polite"></div>
+
+        <form id="composer" class="composer" autocomplete="off">
+          <textarea
+            id="input"
+            rows="1"
+            placeholder="直接输入消息，回车发送 · Shift+Enter 换行"
+            autofocus
+          ></textarea>
+          <button type="submit" id="btn-send" class="btn primary">发送</button>
+        </form>
+      </section>
+    </main>
+
+    <!-- Bottom usage bar — always visible -->
+    <footer class="usage-bar" id="usage-bar">
+      <div class="usage-item">
+        <span class="k">模型</span>
+        <span class="v" id="u-model">—</span>
+      </div>
+      <div class="usage-item">
+        <span class="k">本会话</span>
+        <span class="v" id="u-session">0 in / 0 out</span>
+      </div>
+      <div class="usage-item">
+        <span class="k">本会话费用</span>
+        <span class="v" id="u-session-cost">—</span>
+      </div>
+      <div class="usage-item">
+        <span class="k">累计</span>
+        <span class="v" id="u-total">0 in / 0 out</span>
+      </div>
+      <div class="usage-item">
+        <span class="k">累计费用</span>
+        <span class="v" id="u-total-cost">—</span>
+      </div>
+      <div class="usage-item status">
+        <span class="dot" id="u-dot"></span>
+        <span class="v" id="u-status">启动中</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Setup modal: only when not ready or user opens settings -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2>连接模型（只需一次）</h2>
+      <p class="hint">
+        支持任何 OpenAI 兼容接口（官方 / 中转 / DeepSeek / 硅基流动 / Ollama 等）。
+        Key 只存在本机 <code>.cost-ledger/settings.json</code>，不上传。
+      </p>
+      <label>Base URL
+        <input id="s-base" type="text" placeholder="https://api.openai.com/v1" />
+      </label>
+      <label>API Key
+        <input id="s-key" type="password" placeholder="sk-… 或中转 Key" />
+      </label>
+      <label>模型名
+        <input id="s-model" type="text" placeholder="gpt-4o-mini" />
+      </label>
+      <div class="row2">
+        <label>输入价 $/1M（可选）
+          <input id="s-in-price" type="number" step="0.0001" placeholder="可空" />
+        </label>
+        <label>输出价 $/1M（可选）
+          <input id="s-out-price" type="number" step="0.0001" placeholder="可空" />
+        </label>
+      </div>
+      <label>Provider 标记
+        <input id="s-provider" type="text" placeholder="openai" />
+      </label>
+      <div class="modal-actions">
+        <button type="button" id="btn-cancel" class="btn ghost">取消</button>
+        <button type="button" id="btn-save" class="btn primary">保存并开始</button>
+      </div>
+      <p class="hint small">
+        也可零界面配置：环境变量 <code>OPENAI_API_KEY</code>、
+        <code>OPENAI_BASE_URL</code>、<code>OPENAI_MODEL</code> 后直接启动。
+      </p>
+    </div>
+  </div>
+
+  <script src="/static/chat.js"></script>
+</body>
+</html>
