@@ -35,3 +35,9 @@ def test_ingest_cc_cli(tmp_path: Path) -> None:
     report = runner.invoke(app, ["report", "--ledger", str(ledger), "--json"])
     assert report.exit_code == 0
     assert '"events": 1' in report.stdout
+    again = runner.invoke(
+        app,
+        ["ingest-cc", str(src), "--ledger", str(ledger)],
+    )
+    assert again.exit_code == 0
+    assert "skipped 1" in again.stdout

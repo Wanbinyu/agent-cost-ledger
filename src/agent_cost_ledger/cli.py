@@ -175,14 +175,19 @@ def ingest_cc(
     source = path or default_claude_project_dir()
     try:
         files = iter_cc_paths(source)
+        if not files:
+            raise FileNotFoundError(f"no *.jsonl under {source}")
         events = load_cc_events(files, provider=provider)
-        saved = CostLedger(root).append_many(events)
+        book = CostLedger(root)
+        saved = book.append_many(events, skip_existing=True)
+        skipped = len(events) - len(saved)
     except Exception as exc:  # noqa: BLE001
         err_console.print(f"[red]error:[/red] {exc}")
         raise typer.Exit(1) from exc
+    extra = f" (skipped {skipped} duplicate)" if skipped else ""
     typer.echo(
-        f"ingested {len(saved)} Claude Code event(s) from {source} "
-        f"into {(ledger_dir or _ledger_opt()) / 'ledger.jsonl'}"
+        f"ingested {len(saved)} Claude Code event(s){extra} from {source} "
+        f"into {book.ledger_path}"
     )
 
 
@@ -257,6 +262,39 @@ def _print_report(usage: UsageReport) -> None:
                 str(row.calls),
                 str(row.input_tokens),
                 str(row.output_tokens),
+                c,
+            )
+        console.print(table)
+
+    sessions = {
+        k: v
+        for k, v in (usage.by_session or {}).items()
+        if k != "(none)" or v.get("events")
+    }
+    if len(sessions) > 1 or (len(sessions) == 1 and "(none)" not in sessions):
+        table = Table(title="by session")
+        table.add_column("session")
+        table.add_column("events", justify="right")
+        table.add_column("in", justify="right")
+        table.add_column("out", justify="right")
+        table.add_column("cost", justify="right")
+        for sid, row in sorted(
+            sessions.items(),
+            key=lambda item: str(item[1].get("events") or 0),
+            reverse=True,
+        )[:20]:
+            c = (
+                f"${row['cost_usd']:.6f}"
+                if row.get("cost_usd") is not None
+                else "unknown"
+            )
+            if row.get("cost_is_partial"):
+                c += "*"
+            table.add_row(
+                sid,
+                str(row.get("events") or 0),
+                str(row.get("input_tokens") or 0),
+                str(row.get("output_tokens") or 0),
                 c,
             )
         console.print(table)

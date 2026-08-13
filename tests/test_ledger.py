@@ -91,6 +91,40 @@ def test_usage_missing_not_zero_cost(tmp_path: Path) -> None:
     assert saved.cost_is_partial is True
 
 
+def test_skip_existing_event_ids(tmp_path: Path) -> None:
+    book = CostLedger(tmp_path / "ledger-root")
+    first = UsageEvent(
+        event_id="msg_1",
+        provider="anthropic",
+        model="claude",
+        input_tokens=3,
+        output_tokens=1,
+    )
+    book.append(first)
+    again = book.append_many(
+        [
+            UsageEvent(
+                event_id="msg_1",
+                provider="anthropic",
+                model="claude",
+                input_tokens=3,
+                output_tokens=1,
+            ),
+            UsageEvent(
+                event_id="msg_2",
+                provider="anthropic",
+                model="claude",
+                input_tokens=4,
+                output_tokens=1,
+            ),
+        ],
+        skip_existing=True,
+    )
+    assert len(again) == 1
+    assert again[0].event_id == "msg_2"
+    assert book.report().events == 2
+
+
 def test_naive_since_does_not_crash(tmp_path: Path) -> None:
     from datetime import datetime
 

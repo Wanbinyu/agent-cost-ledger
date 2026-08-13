@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.1
+
+### Added
+
+- GitHub Actions CI (pytest + `ingest-cc` smoke)
+- `ingest-cc` skips already-ingested `event_id`s (safe to re-run)
+- Report shows a by-session table when more than one session exists
+- CONTRIBUTING.md, SECURITY.md, `examples/cc_transcript.jsonl`
+- Clearer error when the default Claude Code project directory is missing
+
 ## 0.3.0
 
 ### Changed

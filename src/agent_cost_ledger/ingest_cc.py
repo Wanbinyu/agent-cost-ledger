@@ -54,6 +54,9 @@ def parse_cc_record(
         return None
     usage = message.get("usage")
     if not isinstance(usage, dict) or not usage:
+        top = raw.get("usage")
+        usage = top if isinstance(top, dict) else {}
+    if not usage:
         return None
 
     input_tokens = _token(usage, "input_tokens", "prompt_tokens")
@@ -109,12 +112,32 @@ def parse_cc_record(
     return UsageEvent.model_validate(payload)
 
 
+def list_claude_projects() -> list[Path]:
+    root = Path.home() / ".claude" / "projects"
+    if not root.is_dir():
+        return []
+    return sorted(p for p in root.iterdir() if p.is_dir())
+
+
 def iter_cc_paths(path: Path) -> list[Path]:
     if path.is_file():
         return [path]
     if path.is_dir():
-        return sorted(path.glob("*.jsonl"))
-    raise FileNotFoundError(f"not found: {path}")
+        files = sorted(path.glob("*.jsonl"))
+        if not files:
+            files = sorted(
+                p for p in path.rglob("*.jsonl") if p.is_file()
+            )
+        return files
+    projects = list_claude_projects()
+    hint = ""
+    if projects:
+        shown = ", ".join(p.name for p in projects[:8])
+        hint = f" Nearby projects: {shown}."
+    raise FileNotFoundError(
+        f"no Claude Code transcripts at {path}.{hint} "
+        "Pass a session JSONL or ~/.claude/projects/<slug>."
+    )
 
 
 def load_cc_events(

@@ -134,6 +134,9 @@ class CostLedger:
             }
         )
 
+    def existing_ids(self) -> set[str]:
+        return {event.event_id for event in self.load_events() if event.event_id}
+
     def append(self, event: UsageEvent) -> UsageEvent:
         self.ensure()
         resolved = self.resolve_cost(event)
@@ -142,8 +145,22 @@ class CostLedger:
             fh.write(line)
         return resolved
 
-    def append_many(self, events: Iterable[UsageEvent]) -> list[UsageEvent]:
-        return [self.append(e) for e in events]
+    def append_many(
+        self,
+        events: Iterable[UsageEvent],
+        *,
+        skip_existing: bool = False,
+    ) -> list[UsageEvent]:
+        seen = self.existing_ids() if skip_existing else set()
+        saved: list[UsageEvent] = []
+        for event in events:
+            if skip_existing and event.event_id and event.event_id in seen:
+                continue
+            resolved = self.append(event)
+            saved.append(resolved)
+            if resolved.event_id:
+                seen.add(resolved.event_id)
+        return saved
 
     def load_events(self) -> list[UsageEvent]:
         self.ensure()

@@ -8,4 +8,5 @@ build/
 .mypy_cache/
 .cost-ledger/
 .demo-ledger/
+.ci-ledger/
 .env

@@ -43,6 +43,17 @@ def test_parse_and_dedupe(tmp_path: Path) -> None:
     assert event.session_id == "s1"
 
 
+def test_top_level_usage_is_accepted() -> None:
+    raw = {
+        "type": "assistant",
+        "message": {"id": "m-top", "role": "assistant", "model": "x"},
+        "usage": {"input_tokens": 7, "output_tokens": 2},
+    }
+    event = parse_cc_record(raw, provider="anthropic")
+    assert event is not None
+    assert event.input_tokens == 7
+
+
 def test_ingest_cc_keeps_official_cost(tmp_path: Path) -> None:
     raw = {
         "type": "assistant",

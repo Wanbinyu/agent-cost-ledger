@@ -7,14 +7,14 @@
 **Token / 费用真账。** 缺单价或缺 usage 不会假装 `$0`。
 
 ![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB)
-![Status](https://img.shields.io/badge/status-v0.3.0-blue)
+![Status](https://img.shields.io/badge/status-v0.3.1-blue)
 
 ---
 
 ## 别人怎么直接用
 
 ```bash
-pipx install G:\skill\agent-cost-ledger
+pipx install git+https://github.com/Wanbinyu/agent-cost-ledger.git
 # 或: python -m pip install -e G:\skill\agent-cost-ledger
 
 # 无子命令 = 报表
@@ -86,7 +86,7 @@ python -m pytest -q
 
 ## 版本
 
-**0.3.0** — 默认 report；`ingest-cc`；缺 usage 不再装 $0；Web 改为 extra。
+**0.3.1** — CI；`ingest-cc` 可重复跑（按 event_id 去重）；报表按会话汇总。
 
 ## License
 

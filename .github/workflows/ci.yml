@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install
+        run: python -m pip install -e ".[test]"
+
+      - name: Test
+        run: python -m pytest -q
+
+      - name: CLI smoke
+        shell: bash
+        run: |
+          cost-ledger --version
+          cost-ledger report --json
+          cost-ledger ingest-cc examples/cc_transcript.jsonl --ledger ./.ci-ledger
+          cost-ledger report --ledger ./.ci-ledger
