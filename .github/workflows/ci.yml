@@ -32,6 +32,7 @@ jobs:
         shell: bash
         run: |
           cost-ledger --version
+          cost-ledger demo
           cost-ledger report --json
           cost-ledger ingest-cc examples/cc_transcript.jsonl --ledger ./.ci-ledger
           cost-ledger report --ledger ./.ci-ledger

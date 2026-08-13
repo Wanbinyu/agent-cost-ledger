@@ -11,6 +11,7 @@ from rich.table import Table
 from .ingest_cc import default_claude_project_dir, iter_cc_paths, load_cc_events
 from .ledger import CostLedger, load_events_file
 from .models import UsageEvent, UsageReport, as_utc
+from .packaged import packaged_data
 from .version import __version__
 
 app = typer.Typer(
@@ -81,6 +82,32 @@ def _launch_ui(
         f"[dim]debug only — does not see Claude Code traffic · data: {root}[/dim]"
     )
     serve(host=host, port=port, open_browser=open_browser, data_dir=root)
+
+
+@app.command("demo")
+def demo(
+    ledger_dir: Path = typer.Option(
+        None,
+        "--ledger",
+        help="Ledger directory (default: a temporary folder)",
+    ),
+) -> None:
+    """Ingest packaged sample events and print a report (no API key)."""
+    import tempfile
+
+    root = ledger_dir or Path(tempfile.mkdtemp(prefix="cost-ledger-demo-"))
+    book = CostLedger(root)
+    with packaged_data("usage_events.jsonl") as path:
+        events = load_events_file(path)
+    saved = book.append_many(events)
+    console.print(
+        f"[dim]ingested {len(saved)} packaged event(s) into {book.ledger_path}[/dim]"
+    )
+    _print_report(book.report())
+    console.print(
+        "[dim]next: cost-ledger add -p openai -m gpt-4o-mini -i 100 -o 50 "
+        "--input-price-per-1m 0.15 --output-price-per-1m 0.6[/dim]"
+    )
 
 
 @app.command("ui")

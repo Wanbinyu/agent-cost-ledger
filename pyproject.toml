@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agent-cost-ledger"
-version = "0.3.1"
+version = "0.3.2"
 description = "Token/cost ledger for coding agents. Optional debug chat UI. Not a request router."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -61,7 +61,12 @@ Repository = "https://github.com/Wanbinyu/agent-cost-ledger"
 where = ["src"]
 
 [tool.setuptools.package-data]
-"agent_cost_ledger" = ["templates/*.html", "static/*.css", "static/*.js"]
+"agent_cost_ledger" = [
+  "templates/*.html",
+  "static/*.css",
+  "static/*.js",
+  "data/*",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

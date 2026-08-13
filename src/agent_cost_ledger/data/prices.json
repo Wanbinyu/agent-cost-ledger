@@ -1,0 +1,14 @@
+{
+  "anthropic/claude-sonnet": {
+    "input_price_per_1m": 3.0,
+    "output_price_per_1m": 15.0,
+    "currency": "USD",
+    "source": "example"
+  },
+  "deepseek/deepseek-chat": {
+    "input_price_per_1m": 0.27,
+    "output_price_per_1m": 1.1,
+    "currency": "USD",
+    "source": "example"
+  }
+}

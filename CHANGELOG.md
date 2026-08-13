@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.2
+
+- `cost-ledger demo` ingests packaged sample events (no API key, no clone).
+- README install path is the public GitHub URL; CI badge added.
+
 ## 0.3.1
 
 ### Added

@@ -9,6 +9,13 @@ from agent_cost_ledger.cli import app
 runner = CliRunner()
 
 
+def test_demo() -> None:
+    result = runner.invoke(app, ["demo"])
+    assert result.exit_code == 0
+    assert "events" in result.stdout
+    assert "ingested" in result.stdout
+
+
 def test_default_is_report(tmp_path: Path, monkeypatch: object) -> None:
     monkeypatch.chdir(tmp_path)  # type: ignore[attr-defined]
     result = runner.invoke(app, [])
